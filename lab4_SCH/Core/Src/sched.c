@@ -86,4 +86,21 @@ void SCH_Delete(uint32_t taskID)
 }
 
 // Run the task in the array of task
-void SCH_Dispatch_Tasks();
+void SCH_Dispatch_Tasks()
+{
+	for (int i = 0; i < SCH_MAX_TASK; i++)
+	{
+		if(have_task[i])
+		{
+			if (SCH_Tasks_G[i].RunMe)
+			{
+				(*SCH_Tasks_G[i].pTask)();
+				SCH_Tasks_G[i].RunMe--;
+				if (!SCH_Tasks_G[i].Period)
+				{
+					SCH_Delete(SCH_Tasks_G[i].TaskID);
+				}
+			}
+		}
+	}
+}
