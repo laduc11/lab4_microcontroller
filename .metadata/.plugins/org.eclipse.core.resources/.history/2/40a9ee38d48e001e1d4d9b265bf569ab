@@ -60,7 +60,6 @@ void SCH_Add_Task(void (*pFunction)(), uint32_t Delay, uint32_t Period)
 // Delete task from array of task
 void SCH_Delete(uint32_t taskID)
 {
-	have_task[taskID] = 0;
 }
 
 // Run the task in the array of task
