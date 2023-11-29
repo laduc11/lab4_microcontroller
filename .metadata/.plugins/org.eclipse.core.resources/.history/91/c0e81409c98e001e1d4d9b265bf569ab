@@ -1,0 +1,30 @@
+/*
+ * sched.c
+ *
+ *  Created on: Nov 29, 2023
+ *      Author: DELL
+ */
+
+#include "sched.h"
+
+#define SCH_MAX_TASK 5
+
+typedef struct
+{
+	void (*pTask)();
+	uint32_t Delay;
+	uint32_t Period;
+	uint8_t RunMe;
+	uint32_t TaskID;
+} sTask;
+
+// array of tasks
+
+void SCH_Init()
+{
+
+}
+void SCH_Update();
+void SCH_Add_Task(void (*pFunction)(), uint32_t Delay, uint32_t Period);
+void SCH_Delete(uint32_t taskID);
+void SCH_Dispatch_Tasks();
