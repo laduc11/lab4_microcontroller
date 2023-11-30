@@ -7,6 +7,8 @@
 
 #include "sched.h"
 
+#define TIME_CYCLE 10	// 10 miliseconds
+
 typedef struct
 {
 	void (*pTask)();
@@ -16,14 +18,18 @@ typedef struct
 	uint32_t TaskID;
 } sTask;
 
+// Timestamps
+uint32_t timestamps;
+
 // array of tasks
 #define SCH_MAX_TASK 5
 sTask SCH_Tasks_G[SCH_MAX_TASK];
-uint8_t have_task[SCH_MAX_TASK];
+uint8_t have_task[SCH_MAX_TASK] = {0};
 
 // Initial the scheduler
 void SCH_Init()
 {
+	timestamps = 0;
 	for (int i = 0; i < SCH_MAX_TASK; i++)
 		have_task[i] = 0;
 }
@@ -31,13 +37,15 @@ void SCH_Init()
 // Increase 1 time unit
 void SCH_Update()
 {
-	for (int i; i < SCH_MAX_TASK; i++)
+	timestamps++;
+	for (int i = 0; i < SCH_MAX_TASK; i++)
 	{
 		if (have_task[i])
 		{
 			if (SCH_Tasks_G[i].Delay == 0)
 			{
 				SCH_Tasks_G[i].RunMe++;
+
 				if (SCH_Tasks_G[i].Period)
 				{
 					SCH_Tasks_G[i].Delay = SCH_Tasks_G[i].Period;
@@ -45,10 +53,8 @@ void SCH_Update()
 			}
 			else
 			{
-				SCH_Tasks_G[i].Delay--;
+				SCH_Tasks_G[i].Delay -= TIME_CYCLE;
 			}
-
-
 		}
 	}
 }
@@ -56,9 +62,9 @@ void SCH_Update()
 // Add new task into array of task
 void SCH_Add_Task(void (*pFunction)(), uint32_t Delay, uint32_t Period)
 {
-	uint32_t current_index = 0;
+	uint32_t current_index;
 	uint8_t finded = 0;
-	for (;current_index < SCH_MAX_TASK; current_index++)
+	for (current_index = 0; current_index < SCH_MAX_TASK; current_index++)
 	{
 		if (!have_task[current_index])
 		{
@@ -103,4 +109,10 @@ void SCH_Dispatch_Tasks()
 			}
 		}
 	}
+}
+
+// Get timestamps
+uint32_t get_time()
+{
+	return timestamps;
 }

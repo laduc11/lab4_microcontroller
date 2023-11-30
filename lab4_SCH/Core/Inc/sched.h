@@ -16,5 +16,6 @@ void SCH_Update();
 void SCH_Add_Task(void (*pFunction)(), uint32_t Delay, uint32_t Period);
 void SCH_Delete(uint32_t taskID);
 void SCH_Dispatch_Tasks();
+uint32_t get_time();
 
 #endif /* INC_SCHED_H_ */
