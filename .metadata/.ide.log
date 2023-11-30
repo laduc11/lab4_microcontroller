@@ -1,0 +1,10 @@
+2023-11-30 15:41:42,834 [INFO] Activator:177 - 
+
+
+2023-11-30 15:41:42,835 [INFO] Activator:178 - !SESSION log4j initialized
+2023-11-30 15:43:40,291 [INFO] Activator:177 - 
+
+
+2023-11-30 15:43:40,292 [INFO] Activator:178 - !SESSION log4j initialized
+2023-11-30 15:44:37,312 [INFO] RetryExec:97 - I/O exception (org.apache.http.ConnectionClosedException) caught when processing request to {s}->https://sw-center.st.com:443: Connection is closed
+2023-11-30 15:44:37,373 [INFO] RetryExec:113 - Retrying request to {s}->https://sw-center.st.com:443

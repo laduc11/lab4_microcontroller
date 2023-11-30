@@ -1,0 +1,6 @@
+sched.c:29:6:SCH_Init	16	static
+sched.c:37:6:SCH_Update	16	static
+sched.c:62:6:SCH_Add_Task	32	static
+sched.c:88:6:SCH_Delete	16	static
+sched.c:94:6:SCH_Dispatch_Tasks	16	static
+sched.c:114:10:get_time	4	static

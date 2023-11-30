@@ -17,7 +17,6 @@ typedef struct
 } sTask;
 
 // array of tasks
-#define SCH_MAX_TASK 5
 sTask SCH_Tasks_G[SCH_MAX_TASK];
 uint8_t have_task[SCH_MAX_TASK];
 uint32_t current_index;

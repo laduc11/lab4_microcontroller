@@ -11,6 +11,8 @@
 #include "main.h"
 //#include <stdint.h>
 
+#define SCH_MAX_TASK 10
+
 void SCH_Init();
 void SCH_Update();
 void SCH_Add_Task(void (*pFunction)(), uint32_t Delay, uint32_t Period);
