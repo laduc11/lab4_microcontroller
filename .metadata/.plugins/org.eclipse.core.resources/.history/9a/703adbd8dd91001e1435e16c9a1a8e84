@@ -1,0 +1,68 @@
+/*
+ * sched.c
+ *
+ *  Created on: Nov 29, 2023
+ *      Author: DELL
+ */
+
+#include "sched.h"
+
+#define TIME_CYCLE 10	// 10 miliseconds
+
+typedef struct
+{
+	void (*pTask)();
+	uint32_t Delay;
+	uint32_t Period;
+	uint8_t RunMe;
+	uint32_t TaskID;
+} sTask;
+
+// Timestamps
+uint32_t timestamps;
+
+// array of tasks
+sTask SCH_Tasks_G[SCH_MAX_TASK];
+uint8_t visited[SCH_MAX_TASK] = {0};
+uint32_t NumOfTask;
+
+// Initial the scheduler
+void SCH_Init()
+{
+	timestamps = 0;
+	NumOfTask = 0;
+	for (int i = 0; i < SCH_MAX_TASK; i++)
+	{
+
+	}
+}
+
+// Increase 1 time unit
+void SCH_Update()
+{
+
+}
+
+// Add new task into array of task
+void SCH_Add_Task(void (*pFunction)(), uint32_t Delay, uint32_t Period)
+{
+
+}
+
+// Delete task from array of task
+void SCH_Delete(uint32_t taskID)
+{
+	have_task[taskID] = 0;
+}
+
+// Run the task in the array of task
+void SCH_Dispatch_Tasks()
+{
+
+}
+
+// Get timestamps
+uint32_t get_time()
+{
+	return timestamps;
+}

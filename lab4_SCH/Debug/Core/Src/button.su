@@ -1,0 +1,3 @@
+button.c:15:9:checkState	4	static
+button.c:22:9:isPressed	4	static
+button.c:32:6:getKey	8	static
