@@ -22,93 +22,131 @@ typedef struct
 uint32_t timestamps;
 
 // array of tasks
-#define SCH_MAX_TASK 5
 sTask SCH_Tasks_G[SCH_MAX_TASK];
-uint8_t have_task[SCH_MAX_TASK] = {0};
+uint8_t visited[SCH_MAX_TASK] = {0};
+uint32_t NumsOfTask;
 
 // Initial the scheduler
 void SCH_Init()
 {
-	timestamps = 0;
-	for (int i = 0; i < SCH_MAX_TASK; i++)
-		have_task[i] = 0;
+    for (int i = 0; i < SCH_MAX_TASK; i++)
+    {
+        visited[i] = 0;
+    }
+    NumsOfTask = 0;
+    timestamps = 0;
 }
 
 // Increase 1 time unit
 void SCH_Update()
 {
-	timestamps++;
-	for (int i = 0; i < SCH_MAX_TASK; i++)
-	{
-		if (have_task[i])
-		{
-			if (SCH_Tasks_G[i].Delay == 0)
-			{
-				SCH_Tasks_G[i].RunMe++;
-
-				if (SCH_Tasks_G[i].Period)
-				{
-					SCH_Tasks_G[i].Delay = SCH_Tasks_G[i].Period;
-				}
-			}
-			else
-			{
-				SCH_Tasks_G[i].Delay -= TIME_CYCLE;
-			}
-		}
-	}
+    timestamps = timestamps + 1;
+    if (visited[0] != 0)
+    {
+        SCH_Tasks_G[0].Delay = SCH_Tasks_G[0].Delay - 1 * TIME_CYCLE;
+        if (SCH_Tasks_G[0].Delay == 0)
+        {
+            SCH_Tasks_G[0].RunMe = 1;
+        }
+    }
 }
 
 // Add new task into array of task
-void SCH_Add_Task(void (*pFunction)(), uint32_t Delay, uint32_t Period)
+uint8_t SCH_Add_Task(void (*pFunction)(), uint32_t Delay, uint32_t Period)
 {
-	uint32_t current_index;
-	uint8_t finded = 0;
-	for (current_index = 0; current_index < SCH_MAX_TASK; current_index++)
-	{
-		if (!have_task[current_index])
-		{
-			have_task[current_index] = 1;
-			finded = 1;
-			break;
-		}
-	}
-	if (!finded)
-	{
-		return;
-	}
-	SCH_Tasks_G[current_index].pTask = pFunction;
-	SCH_Tasks_G[current_index].Delay = Delay;
-	SCH_Tasks_G[current_index].Period = Period;
-	SCH_Tasks_G[current_index].RunMe = 0;
-	SCH_Tasks_G[current_index].TaskID = current_index;
-	have_task[current_index] = 1;
+    // Check array is full
+    if (NumsOfTask == SCH_MAX_TASK)
+        return 0;
+
+    // Add new task
+    uint8_t success = 0;
+    uint32_t curTime = 0;
+    uint32_t task;
+    for (task = 0; task < NumsOfTask; task++)
+    {
+        if (curTime <= Delay)
+        {
+            curTime = curTime + SCH_Tasks_G[task].Delay;
+        }
+
+        if (curTime > Delay)
+        {
+            Delay = Delay - (curTime - SCH_Tasks_G[task].Delay);
+            success = 1;
+            break;
+        }
+    }
+    if (!success)
+    {
+        Delay = Delay - curTime;
+        success = 1;
+    }
+
+    // Shift right the task 1 unit
+    sTask curTask = SCH_Tasks_G[task];
+    curTask.Delay = curTask.Delay - Delay;
+    for (uint32_t i = task; i < NumsOfTask; i++)
+    {
+        sTask tempTask = SCH_Tasks_G[i + 1];
+        SCH_Tasks_G[i + 1] = curTask;
+        SCH_Tasks_G[i + 1].TaskID = SCH_Tasks_G[i + 1].TaskID + 1; // update TaskID
+        // SCH_Tasks_G[i + 1].Delay = SCH_Tasks_G[i + 1].Delay - Delay; // update Delay
+        curTask = tempTask;
+    }
+
+    // Add new task with new Delay into the list
+    SCH_Tasks_G[task].pTask = pFunction;
+    SCH_Tasks_G[task].Delay = Delay;
+    SCH_Tasks_G[task].Period = Period;
+    SCH_Tasks_G[task].RunMe = 0;
+    SCH_Tasks_G[task].TaskID = task;
+
+    // Update status of the array of task
+    NumsOfTask = NumsOfTask + 1;
+    success = 1;
+    visited[NumsOfTask - 1] = 1;
+
+    return success;
 }
 
 // Delete task from array of task
-void SCH_Delete(uint32_t taskID)
+uint8_t SCH_Delete(uint32_t TaskID)
 {
-	have_task[taskID] = 0;
+    uint8_t success = 0;
+    // Check TaskID is correct, array of task is empty
+    if (TaskID >= NumsOfTask || NumsOfTask == 0)
+        return 0;
+
+    // Calculate Delay for all tasks after that and shift left them
+    uint32_t Delay = SCH_Tasks_G[TaskID].Delay;
+    for (uint32_t task = TaskID; task < NumsOfTask - 1; task++)
+    {
+        SCH_Tasks_G[task] = SCH_Tasks_G[task + 1];
+        SCH_Tasks_G[task].TaskID = SCH_Tasks_G[task].TaskID - 1;
+        SCH_Tasks_G[task].Delay = SCH_Tasks_G[task].Delay + Delay;
+    }
+    success = 1;
+    NumsOfTask = NumsOfTask - 1;
+    visited[NumsOfTask] = 0;
+
+    return success;
 }
 
 // Run the task in the array of task
 void SCH_Dispatch_Tasks()
 {
-	for (int i = 0; i < SCH_MAX_TASK; i++)
-	{
-		if(have_task[i])
-		{
-			if (SCH_Tasks_G[i].RunMe)
-			{
-				(*SCH_Tasks_G[i].pTask)();
-				SCH_Tasks_G[i].RunMe--;
-				if (!SCH_Tasks_G[i].Period)
-				{
-					SCH_Delete(SCH_Tasks_G[i].TaskID);
-				}
-			}
-		}
-	}
+    while (SCH_Tasks_G[0].RunMe == 1 || SCH_Tasks_G[0].Delay == 0)
+    {
+        // Run the task
+        (*SCH_Tasks_G[0].pTask)();
+        sTask tempTask = SCH_Tasks_G[0];
+        SCH_Delete(tempTask.TaskID);
+        if (tempTask.Period != 0)
+        {
+            // Add this task into array again
+            SCH_Add_Task(tempTask.pTask, tempTask.Period, tempTask.Period);
+        }
+    }
 }
 
 // Get timestamps

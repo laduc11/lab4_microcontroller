@@ -63,6 +63,8 @@ static void MX_ADC1_Init(void);
 /* USER CODE BEGIN PFP */
 void Toggle_RED();
 void Toggle_GREEN();
+void Toggle_PINK();
+void Toggle_WHITE();
 void print_time();
 /* USER CODE END PFP */
 
@@ -118,9 +120,17 @@ int main(void)
   SCH_Init();
   HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, SET);
 //  SCH_Add_Task(print_time, 200, 10);
+//  if (SCH_Add_Task(Toggle_RED, 1000, 500))
+//	  HAL_UART_Transmit(&huart2, (void *)"success", 7, 1000);
+//
+//  if (SCH_Add_Task(update7seg, 1000, 1000))
+//	  HAL_UART_Transmit(&huart2, (void *)"success", 7, 1000);
+
   SCH_Add_Task(Toggle_RED, 1000, 500);
   SCH_Add_Task(update7seg, 1000, 1000);
   SCH_Add_Task(Toggle_GREEN, 1000, 1500);
+  SCH_Add_Task(Toggle_PINK, 1000, 2000);
+  SCH_Add_Task(Toggle_WHITE, 1000, 2500);
 
   while (1)
   {
@@ -310,11 +320,15 @@ static void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, LED_RED_Pin|LED_GREEN_Pin|SEG0_Pin|SEG1_Pin
                           |SEG2_Pin|SEG3_Pin|SEG4_Pin|SEG5_Pin
                           |SEG6_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, LED_PINK_Pin|LED_WHITE_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : BUTTON_Pin */
   GPIO_InitStruct.Pin = BUTTON_Pin;
@@ -333,6 +347,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+  /*Configure GPIO pins : LED_PINK_Pin LED_WHITE_Pin */
+  GPIO_InitStruct.Pin = LED_PINK_Pin|LED_WHITE_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
 }
 
 /* USER CODE BEGIN 4 */
@@ -346,10 +367,23 @@ void Toggle_GREEN()
 	HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
 }
 
+void Toggle_PINK()
+{
+	HAL_GPIO_TogglePin(LED_PINK_GPIO_Port, LED_PINK_Pin);
+}
+
+void Toggle_WHITE()
+{
+	HAL_GPIO_TogglePin(LED_WHITE_GPIO_Port, LED_WHITE_Pin);
+}
+
 void print_time()
 {
 	char str[12];
-	HAL_UART_Transmit(&huart2, (void *)str, sprintf(str, "%ld\r", get_time()), 500);
+	if (get_time() % 10 == 0)
+	{
+		HAL_UART_Transmit(&huart2, (void *)str, sprintf(str, "%ld\r", get_time()), 500);
+	}
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)

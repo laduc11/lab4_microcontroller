@@ -1,10 +1,23 @@
-11:21:36 **** Incremental Build of configuration Debug for project lab4_SCH ****
+20:36:51 **** Incremental Build of configuration Debug for project lab4_SCH ****
 make -j8 all 
+arm-none-eabi-gcc "../Core/Src/sched.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103x6 -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/sched.d" -MT"Core/Src/sched.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/sched.o"
+arm-none-eabi-gcc -o "lab4_SCH.elf" @"objects.list"   -mcpu=cortex-m3 -T"E:\Microcontroller\lab4_microcontroller\lab4_SCH\STM32F103C6TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="lab4_SCH.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: lab4_SCH.elf
+ 
 arm-none-eabi-size   lab4_SCH.elf 
+arm-none-eabi-objdump -h -S  lab4_SCH.elf  > "lab4_SCH.list"
+arm-none-eabi-objcopy  -O ihex  lab4_SCH.elf  "lab4_SCH.hex"
+arm-none-eabi-objcopy  -O binary  lab4_SCH.elf  "lab4_SCH.bin"
    text	   data	    bss	    dec	    hex	filename
-  16628	    128	   1912	  18668	   48ec	lab4_SCH.elf
+  17048	    128	   2024	  19200	   4b00	lab4_SCH.elf
 Finished building: default.size.stdout
  
+Finished building: lab4_SCH.hex
+Finished building: lab4_SCH.bin
+ 
+ 
+Finished building: lab4_SCH.list
+ 
 
-11:21:37 Build Finished. 0 errors, 0 warnings. (took 162ms)
+20:36:53 Build Finished. 0 errors, 0 warnings. (took 1s.778ms)
 
